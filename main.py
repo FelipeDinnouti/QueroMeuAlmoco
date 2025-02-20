@@ -1,5 +1,6 @@
 from fasthtml.common import *
 from dataclasses import dataclass
+import pages
 
 # Form dataclass, basically the object that is used as standard for the database
 @dataclass
@@ -55,12 +56,20 @@ beforeware = Beforeware(
     skip=[r'/favicon\.ico', r'/static/.*', r'.*\.css', r'.*\.js', '/login', '/', '/about', '/register']
 )
 
+headers = (Link(rel="stylesheet", href="assets/css/style.css"),)
+
 # FastAPI app
-app, rt = fast_app(debug=True, before=beforeware)
+app, rt = fast_app(debug=True, before=beforeware, hdrs=headers)
 
 @app.get("/")
 def home():
-    return Titled("Example Site", P("Lorem Ipsum"), A("Register", href = "/register"), Br(), A("Login", href="/login"), Br(), A("Profile", href="/profile"))
+    return pages.home
+
+@app.post("/")
+def post(request, session):
+    user_auth_before(request, session)
+    print(session["auth"]) # Use this for authentication
+    return pages.home
 
 @rt("/register")
 def get():

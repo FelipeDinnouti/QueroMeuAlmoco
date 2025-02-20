@@ -1,6 +1,8 @@
 ![Check out this site if you need more help](https://realpython.com/python-virtual-environments-a-primer/)
 
-Using the venv (linux recommended, maybe only works on linux? check out the site to figure out if it works on Windows)
+Using a venv isn't obligatory, it's just convenient
+
+Using the venv (linux)
 
 activate the venv
 ``` shell
@@ -12,6 +14,9 @@ $ deactivate
 ```
 to exit
 
+Using the venv (windows)
+
+Make a venv in a folder and add it to .gitignore, works the same as on linux 
 
 ## TODO
 
