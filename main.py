@@ -1,16 +1,16 @@
 from fasthtml.common import *
 from dataclasses import dataclass
 import pages
+import bcrypt
 
 # Form dataclass, basically the object that is used as standard for the database
 @dataclass
-class User: email:str; password:str; gender:bool; # 0 (False) is male, 1 is female 
+class User: email:str; password:str;
 
 profile_form = Form(method="post")  (
         Fieldset(
             Label('Email', Input(name="email")),
             Label("Password", Input(name="password", type="password")),
-            Label("Gender", Input(name="gender", type = "checkbox")),
         ),
         Button("Register", type="submit"),
     )
@@ -27,8 +27,11 @@ db = database("users.db")
 users = db.create(User, pk="email")
 
 # User register handling
-def register_user(email: str, password: str, gender: bool):
-    user = User(email, password, gender)
+def register_user(email: str, password: str):
+    salt = bcrypt.gensalt()
+    hashedPassword = bcrypt.hashpw(password.encode(),salt);
+    print(hashedPassword);
+    user = User(email,hashedPassword);
     users.insert(user)
 
 def fetch_user(email: str, password: str):
@@ -37,7 +40,9 @@ def fetch_user(email: str, password: str):
 
     user = users[email] # Email is the primary key
 
-    if user.password != password: # Very secure password
+    verifier = bcrypt.checkpw(user.password.encode(),password)# Verifies if password is correct
+    print(verifier)
+    if verifier == False:
         return -1 # User exists but wrong password
     
     return user
@@ -89,7 +94,7 @@ def post(email: str, password: str, session):
         return Titled("This e-mail is not yet registered")
 
     session.setdefault("auth",email)
-    return Titled(f"Gender: {user.gender}")
+    return Titled()
 
 
 @rt("/profile")
@@ -100,13 +105,13 @@ def get(session):
 
 # Receives the register information and creates an entry in the database
 @app.route("/register", methods=['post'])
-def post(email: str, password: str, gender: bool): # Variable position must match form input index
+def post(email: str, password: str): # Variable position must match form input index
     user = fetch_user(email, password)
     if user != -2: # User DOES exist
         return Titled("This e-mail has already been registered")
 
-    print(f"email: {email}\npassword: {password}\ngender: {gender}")
-    register_user(email, password, gender)
+    print(f"email: {email}\npassword: {password}\n")
+    register_user(email, password)
      
     return home() # Go to home page
 
