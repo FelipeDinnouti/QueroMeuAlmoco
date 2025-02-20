@@ -20,6 +20,3 @@ Using the venv (windows)
 
 Make a venv in a folder and add it to .gitignore, works the same as on linux 
 
-## TODO
-
-save users on database and check for already existing user with the same email
