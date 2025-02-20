@@ -29,20 +29,21 @@ users = db.create(User, pk="email")
 # User register handling
 def register_user(email: str, password: str):
     salt = bcrypt.gensalt()
-    hashedPassword = bcrypt.hashpw(password.encode(),salt);
-    print(hashedPassword);
-    user = User(email,hashedPassword);
+    hashed_password = bcrypt.hashpw(password.encode(), salt)
+
+    print(hashed_password)
+    user = User(email,hashed_password)
     users.insert(user)
 
-def fetch_user(email: str, password: str):
+def fetch_user(email: str, input_password: str):
     if not email in users:
         return -2
 
     user = users[email] # Email is the primary key
 
-    verifier = bcrypt.checkpw(user.password.encode(),password)# Verifies if password is correct
-    print(verifier)
-    if verifier == False:
+    result = bcrypt.checkpw(input_password.encode(), user.password) # Verifies if password is correct
+
+    if result == False:
         return -1 # User exists but wrong password
     
     return user
