@@ -2,6 +2,7 @@ from fasthtml.common import *
 from dataclasses import dataclass
 import pages
 import bcrypt
+from verifyEmail import verifyEmail
 
 # Form dataclass, basically the object that is used as standard for the database
 @dataclass
@@ -107,6 +108,14 @@ def get(session):
 # Receives the register information and creates an entry in the database
 @app.route("/register", methods=['post'])
 def post(email: str, password: str): # Variable position must match form input index
+    
+    #Verify if e-mail is from Etec's domain
+    emailVerifier = verifyEmail(email)
+    if(emailVerifier):
+        pass
+    else:
+        return Titled("This e-mail is not from Etec, please use your Etec's e-mail")
+    
     user = fetch_user(email, password)
     if user != -2: # User DOES exist
         return Titled("This e-mail has already been registered")
